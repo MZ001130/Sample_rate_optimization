@@ -2,22 +2,24 @@ import pandas as pd
 import numpy as np
 import os 
 
-def load_kinetic_csv(train_path, test_path): 
-    train_df = pd.read_csv(train_path)
-    test_df = pd.read_csv(test_path)
+def k_load_raw_iot_signals(base_path, subset):
+        
+    k_signal_dir = os.path.join(base_path, subset , 'Inertial Signals')
+  
+    files = [
+        f'total_acc_x_{subset}.txt', f'total_acc_y_{subset}.txt', f'total_acc_z_{subset}.txt',
+        f'body_gyro_x_{subset}.txt', f'body_gyro_y_{subset}.txt', f'body_gyro_z_{subset}.txt'
+    ]
 
-    y_train = train_df['Activity']
-    X_train = traind_df.drop(['Activity', 'subject'], axis=1, errors='ignore')
+    data_list = []
+    for file in files:
+        full_path = os.path.join(k_signal_dir, file)
+        channel_data = np.loadtxt(full_path)
+        data_list.append(channel_data)
+    return np.transpose(np.array(data_list), (1, 2, 0))
 
-    y_test = test_df['Activity']
-    X_test = test_df.drop(['Activity', 'subject'], axis=1, errors='ignore')
+PATH = r"datasets\Kinetic\UCI HAR Dataset"
 
-    return X_train, y_train, X_test, y_test
-
-kinetic_train_csv = "C:\Users\moham\Documents\GitHub\Sample_rate_optimization\datasets\Kinetic\train.csv"
-kinetic_test_csv = "C:\Users\moham\Documents\GitHub\Sample_rate_optimization\datasets\Kinetic\test.csv"
-
-kX_train, ky_train, kX_test, ky_test = load_kinetic_csv(kinetic_train_csv, kinetic_test_csv)
-
-print(f"Training data shape: {kX_train.shape}")
-print(f"Unique Activities: {ky_train.unique()}")
+kX_train = k_load_raw_iot_signals(PATH, 'train')
+kX_test = k_load_raw_iot_signals(PATH, 'test')
+print(kX_train.shape, kX_test.shape)
